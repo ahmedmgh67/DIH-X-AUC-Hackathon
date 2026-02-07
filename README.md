@@ -92,7 +92,7 @@ Train, monitor, and manage machine learning models directly from the UI. View ac
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/ynakhla/DIH-X-AUC-Hackathon.git
+   git clone https://github.com/ahmedmgh67/DIH-X-AUC-Hackathon.git
    cd DIH-X-AUC-Hackathon
    ```
 
@@ -264,6 +264,6 @@ tests/test_inventory.py  ...                                      13 passed
 
 | Name | Email | Role |
 |------|-------|------|
-| Ahmed Gamal | ahmedgamal@aucegypt.edu | Developer |
+| Ahmed Gamal | ahmed.m.gamal.h@aucegypt.edu | Developer |
 | Mohamed Emad | mohamedemad@aucegypt.edu | Developer |
 | Omar Sabla | omarsabla@aucegypt.edu | Developer |
