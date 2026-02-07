@@ -43,6 +43,7 @@ data/
 src/freshflow/saved_models/*.pkl
 src/freshflow/saved_models/*.pt
 src/freshflow/saved_models/*.json
+src/freshflow/saved_models/*.csv
 
 # Streamlit
 .streamlit/secrets.toml
