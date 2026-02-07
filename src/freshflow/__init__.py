@@ -1,6 +1,6 @@
 """
-FreshFlow - Intelligent Demand Forecasting System
+Expecto - Intelligent Demand Forecasting System
 """
 
 __version__ = "1.0.0"
-__author__ = "FreshFlow Team"
+__author__ = "Expecto Team"

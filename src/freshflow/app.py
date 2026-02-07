@@ -23,8 +23,8 @@ from freshflow.utils.helpers import format_currency, format_percentage, get_tren
 
 # Page configuration
 st.set_page_config(
-    page_title="FreshFlow - Demand Forecasting",
-    page_icon="🌿",
+    page_title="Expecto - Demand Forecasting",
+    page_icon="E",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -72,15 +72,15 @@ st.markdown("""
 
     /* Sidebar styling */
     section[data-testid="stSidebar"] {
-        background: linear-gradient(180deg, #1E5631 0%, #2E7D32 100%);
+        baaaaackground: linear-gradient(180deg, #1E5631 0%, #2E7D32 100%);
     }
 
     section[data-testid="stSidebar"] .stMarkdown {
-        color: white;
+        color: black;
     }
 
     section[data-testid="stSidebar"] .stSelectbox label {
-        color: white !important;
+        color: black !important;
     }
 
     /* Alert boxes */
@@ -180,6 +180,29 @@ st.markdown("""
         border-radius: 10px;
     }
 
+    /* Hide default Streamlit page navigation */
+    [data-testid="stSidebarNav"] {display: none;}
+
+    /* Style custom nav links */
+    section[data-testid="stSidebar"] a[data-testid="stPageLink-NavLink"] {
+        /* color: rgba(255,255,255,0.85) !important; */
+        font-size: 0.85rem;
+        font-weight: 500;
+        letter-spacing: 0.05em;
+        padding: 6px 12px;
+        border-radius: 6px;
+        transition: background 0.2s;
+    }
+    section[data-testid="stSidebar"] a[data-testid="stPageLink-NavLink"]:hover {
+        /* background: rgba(255,255,255,0.1); */
+        color: white !important;
+    }
+    section[data-testid="stSidebar"] a[data-testid="stPageLink-NavLink"][aria-current="page"] {
+        /* background: rgba(255,255,255,0.15); */
+        color: white !important;
+        font-weight: 600;
+    }
+
     /* Hide default elements */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
@@ -229,9 +252,8 @@ def main():
     with st.sidebar:
         st.markdown("""
         <div style="text-align: center; padding: 20px 0;">
-            <div style="font-size: 3rem;">🌿</div>
-            <div style="font-size: 1.5rem; font-weight: 700; color: white;">FreshFlow</div>
-            <div style="font-size: 0.85rem; color: rgba(255,255,255,0.8);">Intelligent Demand Forecasting</div>
+            <div style="font-size: 1.5rem; font-weight: 700; color: black;">Expecto</div>
+            <div style="font-size: 0.85rem; color: black;">Demand Forecasting</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -245,21 +267,21 @@ def main():
 
         location_options = ["All Locations"] + locations["place_name"].tolist()
         selected_location = st.selectbox(
-            "📍 Select Location",
+            "Select Location",
             location_options,
             index=0
         )
 
         if selected_location == "All Locations":
             place_id = None
-            st.info(f"Analyzing {len(locations)} locations")
+            # st.info(f"Analyzing {len(locations)} locations")
         else:
             place_id = locations[locations["place_name"] == selected_location]["place_id"].values[0]
 
         st.divider()
 
         # Quick Stats
-        st.markdown("**📊 Quick Stats**")
+        st.markdown("**Quick Stats**")
         try:
             min_date, max_date = data_processor.get_date_range()
             days_of_data = (max_date - min_date).days
@@ -283,19 +305,19 @@ def main():
         st.divider()
 
         # Navigation
-        st.markdown("**🧭 Navigation**")
-        st.page_link("pages/1_forecasting.py", label="📈 Forecasting", icon="📈")
-        st.page_link("pages/2_kitchen_prep.py", label="🍳 Kitchen Prep", icon="🍳")
-        st.page_link("pages/3_external_factors.py", label="🌤️ External Factors", icon="🌤️")
-        st.page_link("pages/4_promotions.py", label="🎯 Promotions", icon="🎯")
-        st.page_link("pages/5_anomalies.py", label="🚨 Anomalies", icon="🚨")
-        st.page_link("pages/6_scenarios.py", label="🔮 Scenarios", icon="🔮")
-        st.page_link("pages/7_inventory.py", label="📦 Inventory", icon="📦")
-        st.page_link("pages/8_model_training.py", label="🧠 Model Training", icon="🧠")
+        st.markdown("**Navigation**")
+        st.page_link("app.py", label="DASHBOARD")
+        st.page_link("pages/1_forecasting.py", label="FORECASTING")
+        st.page_link("pages/2_kitchen_prep.py", label="KITCHEN PREP")
+        st.page_link("pages/3_external_factors.py", label="EXTERNAL FACTORS")
+        st.page_link("pages/4_promotions.py", label="PROMOTIONS")
+        st.page_link("pages/5_anomalies.py", label="ANOMALIES")
+        st.page_link("pages/6_scenarios.py", label="SCENARIOS")
+        st.page_link("pages/7_inventory.py", label="INVENTORY")
+        st.page_link("pages/8_model_training.py", label="MODEL TRAINING")
 
     # Main content
-    st.markdown('<p class="main-header">🌿 FreshFlow Dashboard</p>', unsafe_allow_html=True)
-    st.markdown('<p class="sub-header">AI-Powered Demand Forecasting for Fresh Flow Markets</p>', unsafe_allow_html=True)
+    st.markdown('<p class="main-header">Expecto Dashboard</p>', unsafe_allow_html=True)
     st.divider()
 
     # Get data with error handling
@@ -322,35 +344,35 @@ def main():
     total_orders = daily_sales["order_count"].sum()
 
     # KPI Row with styled cards
-    col1, col2, col3, col4, col5 = st.columns(5)
+    col1, col2,  col4, col5 = st.columns(4)
 
     with col1:
         delta = f"{((recent_revenue - prev_revenue) / prev_revenue * 100):+.1f}%" if prev_revenue > 0 else "N/A"
-        st.metric("💰 Latest Revenue", format_currency(recent_revenue), delta)
+        st.metric("Latest Revenue", format_currency(recent_revenue), delta)
 
     with col2:
-        st.metric("📈 Weekly Change", f"{weekly_change:+.1f}%", "vs last week")
+        st.metric("Weekly Change", f"{weekly_change:+.1f}%", "vs last week")
 
-    with col3:
-        accuracy = accuracy_metrics.get("accuracy", 0.85) * 100
-        st.metric("🎯 Model Accuracy", f"{accuracy:.1f}%", "MAPE-based")
+    # with col3:
+    #     accuracy = accuracy_metrics.get("accuracy", 0.85) * 100
+    #     st.metric("Model Accuracy", f"{accuracy:.1f}%", "MAPE-based")
 
     with col4:
-        st.metric("📊 Avg Daily Revenue", format_currency(avg_daily))
+        st.metric("Avg Daily Revenue", format_currency(avg_daily))
 
     with col5:
-        st.metric("🛒 Total Orders", f"{total_orders:,.0f}")
+        st.metric("Total Orders", f"{total_orders:,.0f}")
 
     st.divider()
 
     # Main content - Tabs
-    tab1, tab2, tab3 = st.tabs(["📈 Forecast", "📊 Analytics", "⚡ Insights"])
-
+    tab1, tab2 = st.tabs(["Forecast", "Analytics", ])
+    tab3=0
     with tab1:
         left_col, right_col = st.columns([2, 1])
 
         with left_col:
-            st.subheader("📈 7-Day Revenue Forecast")
+            st.subheader("7-Day Revenue Forecast")
 
             try:
                 forecast_df = get_cached_forecast(forecast_service, place_id, 7)
@@ -419,7 +441,7 @@ def main():
                 total_forecast = forecast_df["predicted_revenue"].sum()
                 st.markdown(f"""
                 <div class="alert-box alert-box-success">
-                    📊 <strong>7-Day Forecast Summary:</strong> {format_currency(total_forecast)} expected revenue
+                    <strong>7-Day Forecast Summary:</strong> {format_currency(total_forecast)} expected revenue
                 </div>
                 """, unsafe_allow_html=True)
 
@@ -427,7 +449,7 @@ def main():
                 st.error(f"Could not generate forecast: {str(e)}")
 
         with right_col:
-            st.subheader("⚡ Smart Alerts")
+            st.subheader("Alerts")
 
             # Weather alert
             try:
@@ -440,28 +462,28 @@ def main():
                     if tomorrow_weather.get("is_rainy"):
                         st.markdown(f"""
                         <div class="alert-box">
-                            🌧️ <strong>Rain expected tomorrow</strong><br>
-                            <small>↑ Hot meals & soups (+10-15%)</small>
+                            <strong>Rain expected tomorrow</strong><br>
+                            <small>Hot meals & soups (+10-15%)</small>
                         </div>
                         """, unsafe_allow_html=True)
                     elif temp < 5:
                         st.markdown(f"""
                         <div class="alert-box alert-box-info">
-                            ❄️ <strong>Cold weather ({temp}°C)</strong><br>
-                            <small>↑ Hot drinks demand expected</small>
+                            <strong>Cold weather ({temp} C)</strong><br>
+                            <small>Hot drinks demand expected</small>
                         </div>
                         """, unsafe_allow_html=True)
                     elif temp > 25:
                         st.markdown(f"""
                         <div class="alert-box alert-box-info">
-                            ☀️ <strong>Hot weather ({temp}°C)</strong><br>
-                            <small>↑ Cold drinks & salads</small>
+                            <strong>Hot weather ({temp} C)</strong><br>
+                            <small>Cold drinks & salads</small>
                         </div>
                         """, unsafe_allow_html=True)
                     else:
                         st.markdown(f"""
                         <div class="alert-box alert-box-success">
-                            🌤️ <strong>{condition}</strong><br>
+                            <strong>{condition}</strong><br>
                             <small>Normal demand expected</small>
                         </div>
                         """, unsafe_allow_html=True)
@@ -473,15 +495,15 @@ def main():
             if tomorrow.weekday() >= 4:
                 st.markdown(f"""
                 <div class="alert-box">
-                    📅 <strong>{tomorrow.strftime('%A')} approaching</strong><br>
-                    <small>↑ Weekend demand (+15-25%)</small>
+                    <strong>{tomorrow.strftime('%A')} approaching</strong><br>
+                    <small>Weekend demand (+15-25%)</small>
                 </div>
                 """, unsafe_allow_html=True)
 
             st.divider()
 
             # Top Items
-            st.subheader("🔥 Top Items")
+            st.subheader("Top Items")
             try:
                 top_items = data_processor.get_top_items(place_id, top_n=5)
                 for idx, row in top_items.iterrows():
@@ -499,7 +521,7 @@ def main():
         col1, col2 = st.columns(2)
 
         with col1:
-            st.subheader("📊 Weekly Demand Pattern")
+            st.subheader("Weekly Demand Pattern")
             try:
                 dow_pattern = data_processor.get_day_of_week_pattern(place_id)
 
@@ -522,7 +544,7 @@ def main():
                 st.error(f"Could not load pattern: {str(e)}")
 
         with col2:
-            st.subheader("📈 Revenue Trend")
+            st.subheader("Revenue Trend")
             try:
                 # Monthly trend
                 daily_sales['month'] = pd.to_datetime(daily_sales['date']).dt.to_period('M')
@@ -549,58 +571,55 @@ def main():
             except:
                 st.info("Insufficient data for trend analysis")
 
-    with tab3:
-        st.subheader("🧠 AI Insights")
+    # with tab3:
+    #     st.subheader("Key Insights")
 
-        col1, col2, col3 = st.columns(3)
+    #     col1, col2, col3 = st.columns(3)
 
-        with col1:
-            st.markdown("""
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                        padding: 24px; border-radius: 16px; color: white; height: 180px;">
-                <div style="font-size: 2rem;">📈</div>
-                <div style="font-size: 1.2rem; font-weight: 600; margin: 10px 0;">Best Day</div>
-                <div style="font-size: 0.9rem; opacity: 0.9;">Saturday typically shows highest revenue</div>
-            </div>
-            """, unsafe_allow_html=True)
+    #     with col1:
+    #         st.markdown("""
+    #         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    #                     padding: 24px; border-radius: 16px; color: white; height: 180px;">
+    #             <div style="font-size: 1.2rem; font-weight: 600; margin: 10px 0;">Best Day</div>
+    #             <div style="font-size: 0.9rem; opacity: 0.9;">Saturday typically shows highest revenue</div>
+    #         </div>
+    #         """, unsafe_allow_html=True)
 
-        with col2:
-            st.markdown("""
-            <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-                        padding: 24px; border-radius: 16px; color: white; height: 180px;">
-                <div style="font-size: 2rem;">🌧️</div>
-                <div style="font-size: 1.2rem; font-weight: 600; margin: 10px 0;">Weather Impact</div>
-                <div style="font-size: 0.9rem; opacity: 0.9;">Rainy days boost hot meal sales by ~12%</div>
-            </div>
-            """, unsafe_allow_html=True)
+    #     with col2:
+    #         st.markdown("""
+    #         <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    #                     padding: 24px; border-radius: 16px; color: white; height: 180px;">
+    #             <div style="font-size: 1.2rem; font-weight: 600; margin: 10px 0;">Weather Impact</div>
+    #             <div style="font-size: 0.9rem; opacity: 0.9;">Rainy days boost hot meal sales by ~12%</div>
+    #         </div>
+    #         """, unsafe_allow_html=True)
 
-        with col3:
-            st.markdown("""
-            <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-                        padding: 24px; border-radius: 16px; color: white; height: 180px;">
-                <div style="font-size: 2rem;">🎯</div>
-                <div style="font-size: 1.2rem; font-weight: 600; margin: 10px 0;">Accuracy</div>
-                <div style="font-size: 0.9rem; opacity: 0.9;">Model achieves 90%+ accuracy on best locations</div>
-            </div>
-            """, unsafe_allow_html=True)
+        # with col3:
+        #     st.markdown("""
+        #     <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        #                 padding: 24px; border-radius: 16px; color: white; height: 180px;">
+        #         <div style="font-size: 1.2rem; font-weight: 600; margin: 10px 0;">Model Accuracy</div>
+        #         <div style="font-size: 0.9rem; opacity: 0.9;">Achieves 90%+ accuracy on best locations</div>
+        #     </div>
+        #     """, unsafe_allow_html=True)
 
-        st.divider()
+        # st.divider()
 
-        # Recommendations
-        st.subheader("💡 Recommendations")
-        st.markdown("""
-        - **Inventory**: Stock 15% extra on Fridays and Saturdays
-        - **Staffing**: Schedule more staff during peak hours (11am-2pm, 6pm-9pm)
-        - **Promotions**: Consider Tuesday/Wednesday deals to boost slow days
-        - **Weather**: Monitor forecasts and adjust hot/cold item prep accordingly
-        """)
+        # # Recommendations
+        # st.subheader("Recommendations")
+        # st.markdown("""
+        # - **Inventory**: Stock 15% extra on Fridays and Saturdays
+        # - **Staffing**: Schedule more staff during peak hours (11am-2pm, 6pm-9pm)
+        # - **Promotions**: Consider Tuesday/Wednesday deals to boost slow days
+        # - **Weather**: Monitor forecasts and adjust hot/cold item prep accordingly
+        # """)
 
     # Footer
     st.divider()
     st.markdown("""
     <div style="text-align: center; color: #666; padding: 20px;">
-        🌿 <strong>FreshFlow</strong> | AI-Powered Demand Forecasting<br>
-        <small>Deloitte x AUC Hackathon 2024</small>
+        <strong>Expecto</strong> | Demand Forecasting<br>
+        <small>Deloitte x AUC Hackathon</small>
     </div>
     """, unsafe_allow_html=True)
 

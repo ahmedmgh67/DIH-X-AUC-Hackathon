@@ -1,14 +1,14 @@
 #!/bin/bash
-# FreshFlow - Run Script
-# Usage: ./run_freshflow.sh
+# Expecto - Run Script
+# Usage: ./run_expecto.sh
 
-echo "🌿 Starting FreshFlow Dashboard..."
+echo "🌿 Starting Expecto Dashboard..."
 echo ""
 
 # Check if dependencies are installed
 python3 -c "import streamlit" 2>/dev/null
 if [ $? -ne 0 ]; then
-    echo "📦 Installing dependencies..."
+    echo "Installing dependencies..."
     pip install -r requirements.txt
 fi
 

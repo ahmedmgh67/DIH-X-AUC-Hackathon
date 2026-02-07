@@ -16,8 +16,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspa
 from freshflow.services.data_processor import DataProcessor
 from freshflow.services.inventory_service import InventoryManager, StockStatus, AlertPriority
 from freshflow.utils.helpers import format_currency
+from freshflow.components import setup_page, sidebar_nav
 
-st.set_page_config(page_title="Inventory - FreshFlow", page_icon="📦", layout="wide")
+setup_page("Inventory")
 
 
 @st.cache_resource
@@ -39,27 +40,29 @@ def status_color(status):
 
 def status_icon(status):
     icons = {
-        StockStatus.CRITICAL: "🔴",
-        StockStatus.LOW: "🟠",
-        StockStatus.ADEQUATE: "🟢",
-        StockStatus.OVERSTOCKED: "🔵"
+        StockStatus.CRITICAL: "CRITICAL",
+        StockStatus.LOW: "LOW",
+        StockStatus.ADEQUATE: "OK",
+        StockStatus.OVERSTOCKED: "OVER"
     }
-    return icons.get(status, "⚪")
+    return icons.get(status, "UNKNOWN")
 
 
 def main():
     dp, inventory_manager = get_services()
 
-    st.markdown("# 📦 Inventory Reorder System")
+    st.markdown("# Inventory Reorder System")
     st.markdown("Smart inventory management with automatic reorder suggestions")
     st.divider()
 
     # Sidebar
     with st.sidebar:
+        sidebar_nav()
+
         st.markdown("### Settings")
         locations = dp.get_locations()
         location_options = ["All Locations"] + locations["place_name"].tolist()
-        selected_location = st.selectbox("📍 Location", location_options)
+        selected_location = st.selectbox("Location", location_options)
 
         place_id = None if selected_location == "All Locations" else \
             locations[locations["place_name"] == selected_location]["place_id"].values[0]
@@ -74,9 +77,6 @@ def main():
             value=0.95,
             format_func=lambda x: f"{x*100:.0f}%"
         )
-
-        st.divider()
-        st.page_link("app.py", label="← Back to Dashboard", icon="🏠")
 
     # Update inventory manager with user parameters
     inventory_manager.set_parameters(lead_time_days=lead_time, service_level=service_level)
@@ -94,27 +94,27 @@ def main():
     with col1:
         st.metric("Total Items", summary['total_items'])
     with col2:
-        st.metric("🔴 Critical", summary['critical'])
+        st.metric("Critical", summary['critical'])
     with col3:
-        st.metric("🟠 Low Stock", summary['low'])
+        st.metric("Low Stock", summary['low'])
     with col4:
-        st.metric("🟢 Adequate", summary['adequate'])
+        st.metric("Adequate", summary['adequate'])
     with col5:
-        st.metric("🔵 Overstocked", summary['overstocked'])
+        st.metric("Overstocked", summary['overstocked'])
 
     if summary['critical'] > 0 or summary['low'] > 0:
-        st.error(f"⚠️ {summary['reorder_needed']} items need reordering! "
+        st.error(f"{summary['reorder_needed']} items need reordering! "
                 f"Estimated cost: {format_currency(summary['estimated_reorder_cost'])}")
 
     st.divider()
 
     # Tabs
     tab1, tab2, tab3, tab4 = st.tabs([
-        "📊 Stock Status", "🛒 Reorder Suggestions", "📈 Demand Analysis", "🧮 Order Optimizer"
+        "Stock Status", "Reorder Suggestions", "Demand Analysis", "Order Optimizer"
     ])
 
     with tab1:
-        st.subheader("📊 Current Stock Status")
+        st.subheader("Current Stock Status")
 
         inventory = inventory_manager.get_inventory_status(
             place_id,
@@ -169,7 +169,7 @@ def main():
             st.info("No inventory data available.")
 
     with tab2:
-        st.subheader("🛒 Smart Reorder Suggestions")
+        st.subheader("Smart Reorder Suggestions")
 
         suggestions = inventory_manager.generate_reorder_suggestions(
             place_id,
@@ -183,23 +183,23 @@ def main():
             high = [s for s in suggestions if s.urgency == AlertPriority.HIGH]
 
             if urgent:
-                st.error(f"🚨 {len(urgent)} items need URGENT ordering!")
+                st.error(f"{len(urgent)} items need URGENT ordering!")
             if high:
-                st.warning(f"⚠️ {len(high)} items need ordering soon")
+                st.warning(f"{len(high)} items need ordering soon")
 
             # Suggestions list
             total_cost = 0
 
             for suggestion in suggestions:
-                urgency_colors = {
-                    AlertPriority.URGENT: "🔴",
-                    AlertPriority.HIGH: "🟠",
-                    AlertPriority.MEDIUM: "🟡",
-                    AlertPriority.LOW: "🟢"
+                urgency_labels = {
+                    AlertPriority.URGENT: "URGENT",
+                    AlertPriority.HIGH: "HIGH",
+                    AlertPriority.MEDIUM: "MEDIUM",
+                    AlertPriority.LOW: "LOW"
                 }
 
                 with st.expander(
-                    f"{urgency_colors[suggestion.urgency]} {suggestion.item_name[:40]} - "
+                    f"[{urgency_labels[suggestion.urgency]}] {suggestion.item_name[:40]} - "
                     f"Order {suggestion.suggested_quantity:.0f} units",
                     expanded=(suggestion.urgency in [AlertPriority.URGENT, AlertPriority.HIGH])
                 ):
@@ -220,10 +220,10 @@ def main():
             st.divider()
             st.markdown(f"### Total Estimated Order Cost: {format_currency(total_cost)}")
         else:
-            st.success("✅ No reorder suggestions - stock levels are adequate!")
+            st.success("No reorder suggestions - stock levels are adequate!")
 
     with tab3:
-        st.subheader("📈 Item Demand Analysis")
+        st.subheader("Item Demand Analysis")
 
         analysis = inventory_manager.analyze_item_demand(
             place_id,
@@ -262,7 +262,7 @@ def main():
             st.dataframe(var_df, use_container_width=True, hide_index=True)
 
     with tab4:
-        st.subheader("🧮 Order Optimizer")
+        st.subheader("Order Optimizer")
 
         st.markdown("Optimize your order based on budget and minimum order requirements")
 
@@ -306,7 +306,7 @@ def main():
                 # Export order
                 csv = pd.DataFrame(optimized['items']).to_csv(index=False)
                 st.download_button(
-                    "📥 Download Order List",
+                    "Download Order List",
                     csv,
                     f"order_{datetime.now().strftime('%Y%m%d')}.csv",
                     "text/csv"

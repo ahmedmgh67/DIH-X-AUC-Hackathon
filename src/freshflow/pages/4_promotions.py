@@ -1,6 +1,6 @@
 """
 FreshFlow - Smart Promotions Engine Page
-AI-powered promotion suggestions and ROI analysis.
+Promotion suggestions and ROI analysis.
 """
 
 import streamlit as st
@@ -15,8 +15,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspa
 from freshflow.services.data_processor import DataProcessor
 from freshflow.services.promotions_service import PromotionsEngine, PromotionType
 from freshflow.utils.helpers import format_currency
+from freshflow.components import setup_page, sidebar_nav
 
-st.set_page_config(page_title="Promotions - FreshFlow", page_icon="🎯", layout="wide")
+setup_page("Promotions")
 
 
 @st.cache_resource
@@ -29,37 +30,36 @@ def get_services():
 def main():
     dp, promotions_engine = get_services()
 
-    st.markdown("# 🎯 Smart Promotions Engine")
-    st.markdown("AI-powered promotion suggestions to boost revenue and reduce waste")
+    st.markdown("# Smart Promotions Engine")
+    st.markdown("Promotion suggestions to boost revenue and reduce waste")
     st.divider()
 
     # Sidebar
     with st.sidebar:
+        sidebar_nav()
+
         st.markdown("### Settings")
         locations = dp.get_locations()
         location_options = ["All Locations"] + locations["place_name"].tolist()
-        selected_location = st.selectbox("📍 Location", location_options)
+        selected_location = st.selectbox("Location", location_options)
 
         place_id = None if selected_location == "All Locations" else \
             locations[locations["place_name"] == selected_location]["place_id"].values[0]
 
-        st.divider()
-        st.page_link("app.py", label="← Back to Dashboard", icon="🏠")
-
     # Main content tabs
     tab1, tab2, tab3, tab4 = st.tabs([
-        "🎯 Suggestions", "📊 Item Analysis", "🔗 Bundle Ideas", "💰 ROI Calculator"
+        "Suggestions", "Item Analysis", "Bundle Ideas", "ROI Calculator"
     ])
 
     with tab1:
-        st.subheader("🎯 AI-Generated Promotion Suggestions")
+        st.subheader("Promotion Suggestions")
 
         suggestions = promotions_engine.generate_promotion_suggestions(place_id)
 
         if suggestions:
             for i, suggestion in enumerate(suggestions):
                 with st.expander(
-                    f"{'🏆' if i == 0 else '💡'} {suggestion.title} - Expected ROI: {suggestion.expected_roi}x",
+                    f"{suggestion.title} - Expected ROI: {suggestion.expected_roi}x",
                     expanded=(i == 0)
                 ):
                     col1, col2, col3 = st.columns(3)
@@ -75,7 +75,7 @@ def main():
                     st.markdown(f"**Best Timing:** {suggestion.best_timing}")
                     st.markdown(f"**Target Items:** {', '.join(suggestion.target_items[:3])}")
 
-                    st.info(f"💡 **Why this works:** {suggestion.reasoning}")
+                    st.info(f"**Why this works:** {suggestion.reasoning}")
 
                     if st.button(f"Calculate ROI", key=f"roi_{i}"):
                         daily_sales = dp.get_daily_sales(place_id)
@@ -94,7 +94,7 @@ def main():
             st.info("No promotion suggestions available for this location.")
 
     with tab2:
-        st.subheader("📊 Item Performance Matrix")
+        st.subheader("Item Performance Matrix")
 
         item_performance = promotions_engine.analyze_item_performance(place_id)
 
@@ -133,13 +133,13 @@ def main():
             dogs = item_performance[item_performance['classification'] == 'Dog']
 
             with col1:
-                st.metric("⭐ Stars", len(stars), help="High volume, high margin - Invest!")
+                st.metric("Stars", len(stars), help="High volume, high margin - Invest!")
             with col2:
-                st.metric("🐄 Cash Cows", len(cows), help="High volume, low margin - Maintain")
+                st.metric("Cash Cows", len(cows), help="High volume, low margin - Maintain")
             with col3:
-                st.metric("❓ Question Marks", len(questions), help="Low volume, high margin - Promote!")
+                st.metric("Question Marks", len(questions), help="Low volume, high margin - Promote!")
             with col4:
-                st.metric("🐕 Dogs", len(dogs), help="Low volume, low margin - Review")
+                st.metric("Dogs", len(dogs), help="Low volume, low margin - Review")
 
             # Detailed table
             st.markdown("### Item Details")
@@ -150,7 +150,7 @@ def main():
             st.dataframe(display_df.head(20), use_container_width=True, hide_index=True)
 
     with tab3:
-        st.subheader("🔗 Bundle Opportunities")
+        st.subheader("Bundle Opportunities")
 
         bundles = promotions_engine.find_bundle_opportunities(place_id)
 
@@ -173,11 +173,11 @@ def main():
 
                     with col2:
                         if lift > 2:
-                            st.success(f"🔥 High potential")
+                            st.success("High potential")
                         elif lift > 1.5:
-                            st.info(f"👍 Good potential")
+                            st.info("Good potential")
                         else:
-                            st.warning(f"📊 Moderate")
+                            st.warning("Moderate")
 
                     st.progress(min(lift / 3, 1.0))
                     st.divider()
@@ -185,7 +185,7 @@ def main():
             st.info("Not enough data to identify bundle opportunities.")
 
     with tab4:
-        st.subheader("💰 Promotion ROI Calculator")
+        st.subheader("Promotion ROI Calculator")
 
         col1, col2 = st.columns(2)
 
@@ -221,11 +221,11 @@ def main():
             st.metric("ROI", f"{roi:.2f}x")
         with col3:
             if roi > 2:
-                st.success("✅ Highly Recommended")
+                st.success("Highly Recommended")
             elif roi > 1:
-                st.info("👍 Recommended")
+                st.info("Recommended")
             else:
-                st.warning("⚠️ Review needed")
+                st.warning("Review needed")
 
 
 if __name__ == "__main__":

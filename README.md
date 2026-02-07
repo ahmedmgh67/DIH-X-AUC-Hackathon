@@ -1,256 +1,269 @@
-# Deloitte x AUC Hackathon
+# Expecto
 
-## Introduction
+**Expecto** is a demand forecasting and inventory optimization platform built for the restaurant and grocery industry. It tackles the core challenge of balancing stock levels: over-stocking leads to waste and spoiled inventory, while under-stocking causes stockouts, lost revenue, and frustrated customers. Expecto replaces guesswork with data-driven predictions powered by machine learning, enabling businesses to forecast demand accurately, optimize kitchen prep, detect anomalies, and manage inventory efficiently.
 
-Welcome to the Deloitte x AUC Hackathon. As potential future consultants at Deloitte, you will face a reality that defines the consulting profession: clients come to us with problems, not solutions.
-
-### The Consultant's Challenge
-
-Clients expect consultants to diagnose their challenges and architect innovative solutions. You will not receive a step-by-step guide, just like in the real world. Success requires both technical excellence and business acumen across four key dimensions:
-
-**Technical Skills**: Can you build your solution?
-
-**Business Thinking**: Should you build it? What value does it provide?
-
-**Team Work**: Can you deliver it together?
-
-**Communication**: Can you sell your solution?
-
-### How to Approach This Challenge
-
-Each use case below presents a client with a real business problem. The business questions provided are meant to help guide your thinking and give you ideas on possible features to implement. Your approach should be:
-
-1. Frame the business problem and understand the value proposition
-2. Identify which business questions your solution will address
-3. Design and implement technical features that deliver measurable business impact
-4. Document how your solution creates value for the client (feel free to name your proposed product something creative)
-
-Remember: clients look for measurable impact, scalability, and competitive advantages. Think like a consultant, build like an engineer.
+Built for the **Deloitte x AUC Hackathon** - Inventory Management use case (Fresh Flow Markets).
 
 ---
 
-## Dataset Download
+## Features
 
-Due to file size limitations, the datasets are provided via GitHub Releases.
+### 1. Dashboard
+The main dashboard provides a real-time overview of business performance with key KPIs (latest revenue, weekly change, average daily revenue, total orders), a 7-day revenue forecast chart with confidence intervals, weather-based alerts, and a top-selling items summary.
 
-### Quick Start
+![Dashboard](docs/screenshots/dashboard.png)
 
-1. **Clone the Repository**
+### 2. Demand Forecasting
+Detailed demand predictions at both the revenue and item level. Supports configurable forecast horizons (7-30 days) with daily, weekly, or monthly granularity. Displays model accuracy metrics (MAPE, RMSE, R2) and provides a daily forecast breakdown with item-level quantities. Includes CSV export for integration with external systems.
+
+![Forecasting](docs/screenshots/forecasting.png)
+
+### 3. Kitchen Prep Optimizer
+Calculates optimal daily prep quantities to minimize food waste. Automatically adjusts for weather conditions, day-of-week patterns, and configurable safety buffers (5-25%). Outputs a printable prep list with confidence levels and historical accuracy tracking.
+
+![Kitchen Prep](docs/screenshots/kitchen_prep.png)
+
+### 4. External Factors Analysis
+Analyzes how external variables impact sales performance:
+- **Time Patterns**: Day-of-week demand curves, hourly patterns, monthly seasonality
+- **Weather Impact**: Temperature and precipitation correlation with revenue
+- **Campaign Performance**: Active campaign tracking with lift metrics by campaign type
+- **Holiday Impact**: Danish holiday calendar with historical impact analysis
+
+![External Factors](docs/screenshots/external_factors.png)
+
+### 5. Promotions Engine
+Generates data-driven promotion suggestions with ROI predictions. Features a BCG-style item performance matrix (Stars, Cash Cows, Question Marks, Dogs), bundle opportunity detection via co-occurrence analysis, and an interactive ROI calculator for evaluating custom discount strategies.
+
+![Promotions](docs/screenshots/promotions.png)
+
+### 6. Anomaly Detection
+Automatically identifies unusual sales patterns using statistical methods (Z-score deviation, day-of-week analysis, trend change detection). Each anomaly includes severity classification (Critical/High/Medium/Low), possible root causes, and recommended corrective actions. Configurable sensitivity and lookback period.
+
+![Anomalies](docs/screenshots/anomalies.png)
+
+### 7. What-If Scenario Planner
+Simulates the revenue and order impact of different scenarios before they happen:
+- **Weather**: Sunny, rain, heavy rain, snow, extreme temperatures
+- **Promotions**: Discount percentages, BOGO, free delivery, loyalty point multipliers
+- **Local Events**: Festivals, sports events, concerts, competitor closures
+- **Holidays**: Christmas, Easter, Midsummer, and other Danish holidays
+- **Custom**: Build custom scenarios with adjustable revenue/order multipliers
+
+![Scenarios](docs/screenshots/scenarios.png)
+
+### 8. Inventory Reorder System
+Manages stock levels with automatic reorder point calculations using safety stock formulas. Tracks stock status (Critical/Low/Adequate/Overstocked), generates prioritized reorder suggestions, analyzes demand variability, and provides budget-constrained order optimization. Configurable lead time and service level (90%, 95%, 99%).
+
+![Inventory](docs/screenshots/inventory.png)
+
+### 9. Model Training Dashboard
+Train, monitor, and manage machine learning models directly from the UI. View accuracy metrics across all locations, train new Gradient Boosting models for locations with sufficient data (60+ days), compare performance across locations, and retrain or export model reports.
+
+![Model Training](docs/screenshots/model_training.png)
+
+---
+
+## Technologies Used
+
+| Category | Technology | Purpose |
+|----------|-----------|---------|
+| **Web Framework** | Streamlit | Interactive dashboard and UI |
+| **Machine Learning** | scikit-learn | Gradient Boosting demand forecasting |
+| **Deep Learning** | PyTorch | LSTM neural network for time-series prediction |
+| **Data Processing** | pandas, NumPy | Data manipulation and numerical computing |
+| **Statistical Analysis** | SciPy | Anomaly detection (Z-score analysis) |
+| **Visualization** | Plotly | Interactive charts and graphs |
+| **Visualization** | Matplotlib, Seaborn | Statistical plots |
+| **Weather API** | Open-Meteo | Real-time and historical weather data (free, no API key) |
+| **Holiday Data** | holidays (Python) | Danish holiday calendar |
+| **HTTP** | Requests | External API communication |
+| **Testing** | pytest | Unit and integration testing |
+
+---
+
+## Installation
+
+### Prerequisites
+- Python 3.8 or higher
+- pip package manager
+
+### Steps
+
+1. **Clone the repository**
    ```bash
    git clone https://github.com/ynakhla/DIH-X-AUC-Hackathon.git
    cd DIH-X-AUC-Hackathon
    ```
 
-2. **Download Dataset from Release**
-   
-   **[Download Datasets Here →](https://github.com/ynakhla/DIH-X-AUC-Hackathon/releases/tag/v1.0-data)**
+2. **Download the dataset**
 
-   Choose the data for your use case:
-   - **inventory-management.zip** (667 MB) - Use Case 1: Fresh Flow Markets
-   - **menu-engineering-part1.zip** (1.4 GB) - Use Case 2: Flavor Flow Craft
-   - **menu-engineering-part2.zip** (1.2 GB) - Use Case 2: Flavor Flow Craft
-   - **shift-planning.zip** (292 MB) - Use Case 3: Quick Serve Kitchens
-
-   **Note:** Menu Engineering requires BOTH Part 1 and Part 2
-
-3. **Extract to Data Folder**
-   
-   Extract the downloaded ZIP file(s) into the `data/` directory. Your structure should be:
+   Download **inventory-management.zip** from the [GitHub Releases page](https://github.com/ynakhla/DIH-X-AUC-Hackathon/releases/tag/v1.0-data) and extract it into the `data/` directory:
    ```
-   DIH-X-AUC-Hackathon/
-   ├── data/
-   │   ├── Inventory Management/     (CSV files)
-   │   ├── Menu Engineering Part 1/  (CSV files)
-   │   ├── Menu Engineering Part 2/  (CSV files)
-   │   └── Shift Planning/           (CSV files)
-   └── src/
+   data/
+   └── Inventory Management/
+       ├── fct_orders.csv
+       ├── fct_order_items.csv
+       ├── dim_menu_items.csv
+       ├── dim_places.csv
+       ├── dim_campaigns.csv
+       └── fct_campaigns.csv
    ```
 
-4. **Install Dependencies**
+3. **Install dependencies**
    ```bash
    pip install -r requirements.txt
    ```
 
+4. **Run the application**
+   ```bash
+   cd src/freshflow
+   streamlit run app.py
+   ```
+
+5. **Access the dashboard** at `http://localhost:8501`
+
+---
+
+## Usage
+
+### Getting Started
+1. Open the dashboard - the main page shows KPIs and a 7-day forecast for all locations
+2. Use the sidebar to select a specific restaurant location
+3. Navigate between pages using the sidebar menu
+
+### Training a Model
+1. Go to **Model Training** from the sidebar
+2. The system identifies locations with 60+ days of historical data
+3. Click "Train Model" for your target location
+4. Once trained, forecasts across all pages will use the trained model
+
+### Daily Workflow
+1. Check the **Dashboard** for today's KPIs and weather alerts
+2. Use **Kitchen Prep** to generate optimized prep quantities for the day
+3. Review **Forecasting** for the upcoming week's demand predictions
+4. Check **Inventory** for items that need reordering
+5. Monitor **Anomalies** for unusual sales patterns requiring attention
+
+### Planning Ahead
+- Use **Scenario Planner** to simulate the impact of upcoming events, holidays, or weather
+- Use **Promotions** to identify slow-moving items and plan discount strategies
+- Use **External Factors** to understand seasonal patterns and optimize staffing
+
 ### Data Notes
-- All timestamps are UNIX integers (use `FROM_UNIXTIME()` in MySQL)
+- All timestamps in the source data are UNIX integers
 - All monetary values are in DKK (Danish Krone)
-- See `data/README.md` for detailed documentation
+- The weather service is configured for Copenhagen (55.68N, 12.57E)
 
 ---
 
-## Repository & Documentation Requirements
-
-### Recommended Folder Structure
+## Architecture
 
 ```
-your-project/
-├── README.md                    # Required
-├── requirements.txt             # Python dependencies
-├── package.json                 # Node.js dependencies
-├── src/                         # Source code
-│   ├── main.py                  # Entry point
-│   ├── models/                  # Data models/ML models
-│   ├── services/                # Business logic
-│   ├── utils/                   # Utility functions
-│   └── api/                     # API endpoints
-├── tests/                       # Test files
-├── docs/                        # Additional documentation
-├── config/                      # Configuration files
-└── data/                        # Sample data (no sensitive info)
+src/freshflow/
+├── app.py                          # Main dashboard entry point
+├── components.py                   # Reusable UI components & shared navigation
+│
+├── pages/                          # Application pages
+│   ├── 1_forecasting.py            # Demand forecasting with item breakdown
+│   ├── 2_kitchen_prep.py           # Kitchen prep quantity optimizer
+│   ├── 3_external_factors.py       # Weather, holidays, campaign analysis
+│   ├── 4_promotions.py             # Promotion suggestions & ROI calculator
+│   ├── 5_anomalies.py              # Anomaly detection & alerting
+│   ├── 6_scenarios.py              # What-if scenario simulation
+│   ├── 7_inventory.py              # Inventory reorder management
+│   └── 8_model_training.py         # ML model training & monitoring
+│
+├── services/                       # Business logic layer
+│   ├── data_processor.py           # CSV data loading & preprocessing
+│   ├── weather_service.py          # Open-Meteo API integration
+│   ├── feature_engineer.py         # Feature matrix creation for ML
+│   ├── anomaly_service.py          # Statistical anomaly detection
+│   ├── promotions_service.py       # BCG matrix & promotion analysis
+│   ├── inventory_service.py        # Reorder points & safety stock
+│   └── scenario_service.py         # What-if scenario simulation
+│
+├── models/                         # Machine learning layer
+│   ├── lstm_model.py               # LSTM neural network architecture
+│   ├── gradient_boost_model.py     # Gradient Boosting forecaster
+│   ├── trainer.py                  # Model training pipeline
+│   └── predictor.py                # Forecast generation service
+│
+├── utils/
+│   └── helpers.py                  # Formatting, dates, Danish holidays
+│
+└── saved_models/                   # Trained model artifacts
+    ├── gb_model_*.pkl              # Gradient Boosting models
+    ├── gb_metrics_*.json           # Model performance metrics
+    └── *_v2.pt                     # LSTM model checkpoints
 ```
 
-### Required Components
+### Data Flow
 
-### 1. README.md
+```
+CSV Data (data/Inventory Management/)
+    |
+    v
+DataProcessor (load, clean, aggregate)
+    |
+    +---> WeatherService (Open-Meteo API)
+    |         |
+    v         v
+FeatureEngineer (combine sales + weather + temporal features)
+    |
+    v
+ML Models (Gradient Boosting / LSTM)
+    |
+    v
+ForecastService (predictions + confidence intervals)
+    |
+    v
+Domain Services (anomaly, inventory, promotions, scenarios)
+    |
+    v
+Streamlit Pages (interactive visualization)
+```
 
-Your README is the first document evaluators will review. It must include:
+### Key Algorithms
 
-- **Project Name and Description**: A clear, concise description of what your project does and the problem it solves
-- **Features**: List all features and functionalities with screenshots from your UI
-- **Technologies Used**: Document all technologies, frameworks, and external APIs used
-- **Installation**: Provide step-by-step installation instructions
-- **Usage**: Include usage guidelines and examples
-- **Architecture**: Brief overview of the system architecture (optional but recommended)
-- **Team Members**: List all team members with their roles and contributions
+**Demand Forecasting**: Ensemble of Gradient Boosting (scikit-learn) and LSTM (PyTorch). Features include lagged sales (1-day, 7-day), rolling statistics, day-of-week encoding, weather variables, and holiday flags.
 
-#### Team Collaboration Requirements
+**Anomaly Detection**: Z-score based deviation detection with configurable thresholds (2.0-3.0 sigma), day-of-week deviation analysis, and trend change identification.
 
-The evaluation heavily weighs **team collaboration** based on GitHub commit history:
+**Inventory Optimization**: Reorder Point = (Avg Daily Demand x Lead Time) + Safety Stock, where Safety Stock = Z x daily_std x sqrt(Lead Time). Z-values: 1.28 (90%), 1.65 (95%), 2.33 (99% service level).
 
-| Distribution | Assessment | Impact on Score |
-|--------------|------------|-----------------|
-| Even split (e.g., 33%/33%/34%) | Excellent | Full points |
-| Reasonable split (e.g., 45%/35%/20%) | Good | Most points |
-| Uneven split (e.g., 80%/15%/5%) | Concerning | Reduced points |
-| Single contributor (100%) | Poor | Significant penalty |
+---
 
-Note: If a team member is a non technical member, please document their contributions in the README file to ensure fair assessment.
+## Testing
 
-**Best Practices for Commits:**
+The project includes unit tests covering utility functions, inventory calculations, and anomaly detection structures.
 
-1. Each team member should commit their own work - Don't have one person commit everything
-2. Use meaningful commit messages:
-   - Good: "Add user authentication with JWT tokens"
-   - Bad: "update" or "fix"
-3. Commit regularly - Small, frequent commits are better than one massive commit
-4. Use branches for features - Merge via pull requests when possible
-
-**Check Your Contribution Distribution:**
-
-Run this command in your repository:
+**Run all tests:**
 ```bash
-git shortlog -sn --all
+pytest tests/ -v
 ```
 
-### 2. Code Organization
-- Use proper file extensions for all code files
-- Maintain a clear and logical folder structure
-- Separate concerns into appropriate directories (models, services, utils, api)
-- Include an entry point file (e.g., main.py, index.js)
+| Test File | What It Covers | Tests |
+|-----------|---------------|-------|
+| `test_helpers.py` | Formatting, holidays, weekends, MAPE/RMSE/R2 metrics, trend indicators, date ranges | 26 |
+| `test_inventory.py` | Reorder point formula, EOQ calculation, service level Z-scores, parameter configuration | 13 |
+| `test_anomaly.py` | Anomaly types, alert severity levels, anomaly data structure creation | 6 |
 
-### 3. Dependencies Management
-- Include a dependencies file (requirements.txt for Python, package.json for Node.js, etc.)
-- List all libraries and frameworks required to run the project
-- Specify version numbers where applicable
-
-### 4. Code Quality
-- Add meaningful comments and docstrings to all functions and classes
-- Include file headers explaining the purpose of each module
-- Follow language-specific best practices and conventions
-- Ensure code runs without errors
-
-### 5. Security
-- Do not include sensitive data such as API keys, passwords, or tokens
-- Use environment variables for configuration
-- Include a .gitignore file to exclude sensitive or unnecessary files
-
-### 6. Testing
-- Include test files in a dedicated tests directory
-- Document how to run tests
-
-### 7. Additional Documentation
-- Provide architecture overview or diagrams (optional but recommended)
-- Include any additional documentation in a docs directory
-
-### 8. Repository Access
-- Repository must be public
-- Use the main branch for submission
-- Ensure all team members have appropriate access
-
+```
+$ pytest tests/ -v
+========================= test session starts =========================
+tests/test_anomaly.py    ...                                       6 passed
+tests/test_helpers.py    ...                                      26 passed
+tests/test_inventory.py  ...                                      13 passed
+========================= 45 passed in 1.26s ==========================
+```
 
 ---
 
-## Use Cases (Clients)
+## Team Members
 
-### Fresh Flow Markets: Inventory Management
-
-**The Challenge**
-
-Restaurant and grocery owners face a relentless balancing act. Over-stocking leads to waste and expired inventory eating away at profits. Under-stocking causes stockouts, lost revenue, and frustrated customers. The root cause? Poor demand forecasting. Without accurate predictions, businesses are trapped in a cycle of unnecessary costs, reduced profitability, and unsustainable operations. FreshFlow needs intelligent systems, not gut instinct.
-
-**Potential Business Questions**
-
-The following questions are provided to help guide your thinking and inspire potential features for your solution:
-
-- How do we accurately predict daily, weekly, and monthly demand?
-- What prep quantities should kitchens prepare to minimize waste?
-- How can we prioritize inventory based on expiration dates?
-- What promotions or bundles can move near-expired items profitably?
-- How do external factors (weather, holidays, weekends) impact sales?
-
----
-
-### Flavor Flow Craft: Menu Engineering
-
-**The Challenge**
-
-FlavorCraft sits on a goldmine of historical sales data—every order, every customer preference—yet they're making menu decisions on hunches. They don't know which dishes are secretly losing money, or what tweaks could turn underperformers into bestsellers. This isn't just a missed opportunity; it's revenue left on the table. Your mission is to create a data-driven assistant that analyzes their menu and sales data, suggesting improvements to items, descriptions, and pricing. But don't stop there—your client manager encourages innovative thinking beyond the obvious.
-
-**Potential Business Questions**
-
-The following questions are provided to help guide your thinking and inspire potential features for your solution:
-
-- Which menu items are stars, plowhorses, puzzles, or dogs?
-- How should we adjust pricing to maximize profitability?
-- What wording or descriptions increase item sales?
-- Which items should be promoted, re-engineered, or eliminated?
-- What hidden patterns exist in customer purchasing behavior?
-
-
-
-### Quick Serve Kitchens: Shift Planning
-
-**The Challenge**
-
-Monday's schedule looks perfect. Wednesday: three call-offs. Friday: foot traffic doubles because TikTok made your item viral. The schedule is now a dumpster fire. This is QuickServe's weekly reality. The core problem? Accurately predicting and meeting wildly fluctuating customer demand to ensure optimal staffing on every shift. Too few people means terrible service and burnout. Too many means spiraling labor costs. QuickServe needs a Shift Wizard—an intelligent system that monitors schedules, coverage, PTO, surprise events, and constantly recommends the next best move.
-
-**Potential Business Questions**
-
-The following questions are provided to help guide your thinking and inspire potential features for your solution:
-
-- How do we predict demand spikes from social media, weather, or events?
-- What's the optimal staffing level for each shift?
-- How do we quickly adjust when call-offs happen?
-- How can we balance labor costs with service quality?
-- How do we incorporate employee preferences while meeting business needs?
-
----
-
-## Evaluation Criteria
-
-### Documentation Quality
-Your project documentation will be evaluated based on the clarity and completeness of your README file, the presence of code comments and docstrings, and the overall organization of documentation materials.
-
-### Code Architecture & Modularity
-The structure and organization of your codebase will be assessed, including proper separation of concerns, logical folder hierarchy, and modular design patterns that promote maintainability and scalability.
-
-### Team Collaboration
-Collaboration will be evaluated through GitHub commit history, ensuring all team members have contributed meaningfully to the project with clear and descriptive commit messages.
-
-### AI/ML Integration
-If your solution incorporates artificial intelligence or machine learning components, the implementation, documentation, and effectiveness of these technologies will be evaluated.
-
-### Business Value & Innovation
-Your solution will be assessed on its practical applicability, innovation in addressing the problem statement, and potential real-world impact for the specified use case.
-
-
+| Name | Email | Role |
+|------|-------|------|
+| Ahmed Gamal | ahmedgamal@aucegypt.edu | Developer |
+| Mohamed Emad | mohamedemad@aucegypt.edu | Developer |
+| Omar Sabla | omarsabla@aucegypt.edu | Developer |

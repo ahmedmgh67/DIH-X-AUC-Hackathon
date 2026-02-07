@@ -17,8 +17,9 @@ from freshflow.services.data_processor import DataProcessor
 from freshflow.services.weather_service import WeatherService
 from freshflow.services.scenario_service import ScenarioPlanner, ScenarioType
 from freshflow.utils.helpers import format_currency
+from freshflow.components import setup_page, sidebar_nav
 
-st.set_page_config(page_title="Scenarios - FreshFlow", page_icon="🔮", layout="wide")
+setup_page("Scenarios")
 
 
 @st.cache_resource
@@ -32,16 +33,18 @@ def get_services():
 def main():
     dp, ws, scenario_planner = get_services()
 
-    st.markdown("# 🔮 What-If Scenario Planner")
+    st.markdown("# What-If Scenario Planner")
     st.markdown("Simulate different scenarios and see how they impact your forecast")
     st.divider()
 
     # Sidebar
     with st.sidebar:
+        sidebar_nav()
+
         st.markdown("### Settings")
         locations = dp.get_locations()
         location_options = ["All Locations"] + locations["place_name"].tolist()
-        selected_location = st.selectbox("📍 Location", location_options)
+        selected_location = st.selectbox("Location", location_options)
 
         place_id = None if selected_location == "All Locations" else \
             locations[locations["place_name"] == selected_location]["place_id"].values[0]
@@ -58,30 +61,27 @@ def main():
 
         forecast_days = st.slider("Forecast Days", 3, 14, 7)
 
-        st.divider()
-        st.page_link("app.py", label="← Back to Dashboard", icon="🏠")
-
     # Get available scenarios
     available = scenario_planner.get_available_scenarios()
 
     # Tabs for different scenario types
     tab1, tab2, tab3, tab4, tab5 = st.tabs([
-        "🌧️ Weather", "🎯 Promotions", "🎉 Events", "🎄 Holidays", "🔧 Custom"
+        "Weather", "Promotions", "Events", "Holidays", "Custom"
     ])
 
     with tab1:
-        st.subheader("🌧️ Weather Impact Simulation")
+        st.subheader("Weather Impact Simulation")
 
         col1, col2 = st.columns([1, 2])
 
         with col1:
             weather_options = {
-                'sunny': '☀️ Sunny',
-                'rain': '🌧️ Rain',
-                'heavy_rain': '⛈️ Heavy Rain',
-                'snow': '❄️ Snow',
-                'extreme_cold': '🥶 Extreme Cold',
-                'extreme_heat': '🥵 Extreme Heat'
+                'sunny': 'Sunny',
+                'rain': 'Rain',
+                'heavy_rain': 'Heavy Rain',
+                'snow': 'Snow',
+                'extreme_cold': 'Extreme Cold',
+                'extreme_heat': 'Extreme Heat'
             }
 
             selected_weather = st.radio(
@@ -135,7 +135,7 @@ def main():
                     st.markdown(f"- {insight}")
 
     with tab2:
-        st.subheader("🎯 Promotion Impact Simulation")
+        st.subheader("Promotion Impact Simulation")
 
         col1, col2 = st.columns([1, 2])
 
@@ -202,18 +202,18 @@ def main():
                     st.markdown(f"- {insight}")
 
     with tab3:
-        st.subheader("🎉 Local Event Impact Simulation")
+        st.subheader("Local Event Impact Simulation")
 
         col1, col2 = st.columns([1, 2])
 
         with col1:
             event_options = {
-                'local_festival': '🎪 Local Festival',
-                'sports_event': '⚽ Sports Event',
-                'concert_nearby': '🎵 Concert Nearby',
-                'competitor_closed': '🏪 Competitor Closed',
-                'road_construction': '🚧 Road Construction',
-                'power_outage': '⚡ Power Outage'
+                'local_festival': 'Local Festival',
+                'sports_event': 'Sports Event',
+                'concert_nearby': 'Concert Nearby',
+                'competitor_closed': 'Competitor Closed',
+                'road_construction': 'Road Construction',
+                'power_outage': 'Power Outage'
             }
 
             selected_event = st.radio(
@@ -249,19 +249,19 @@ def main():
                     st.markdown(f"- {insight}")
 
     with tab4:
-        st.subheader("🎄 Holiday Impact Simulation")
+        st.subheader("Holiday Impact Simulation")
 
         col1, col2 = st.columns([1, 2])
 
         with col1:
             holiday_options = {
-                'christmas_eve': '🎄 Christmas Eve',
-                'christmas_day': '🎁 Christmas Day',
-                'new_years_eve': '🥂 New Year\'s Eve',
-                'new_years_day': '🎊 New Year\'s Day',
-                'easter': '🐰 Easter',
-                'midsummer': '☀️ Midsummer',
-                'constitution_day': '🇩🇰 Constitution Day'
+                'christmas_eve': 'Christmas Eve',
+                'christmas_day': 'Christmas Day',
+                'new_years_eve': 'New Year\'s Eve',
+                'new_years_day': 'New Year\'s Day',
+                'easter': 'Easter',
+                'midsummer': 'Midsummer',
+                'constitution_day': 'Constitution Day'
             }
 
             selected_holiday = st.radio(
@@ -282,9 +282,9 @@ def main():
                 result = st.session_state['holiday_result']
 
                 if result.revenue_change_pct < 0:
-                    st.warning(f"⚠️ {selected_holiday.replace('_', ' ').title()} typically sees reduced operations")
+                    st.warning(f"{selected_holiday.replace('_', ' ').title()} typically sees reduced operations")
                 else:
-                    st.success(f"📈 {selected_holiday.replace('_', ' ').title()} brings increased demand!")
+                    st.success(f"{selected_holiday.replace('_', ' ').title()} brings increased demand!")
 
                 col_a, col_b = st.columns(2)
                 with col_a:
@@ -298,7 +298,7 @@ def main():
                     st.markdown(f"- {insight}")
 
     with tab5:
-        st.subheader("🔧 Custom Scenario Builder")
+        st.subheader("Custom Scenario Builder")
 
         st.markdown("Create your own scenario with custom parameters")
 

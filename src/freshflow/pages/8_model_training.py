@@ -18,8 +18,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspa
 
 from freshflow.services.data_processor import DataProcessor
 from freshflow.utils.helpers import format_currency
+from freshflow.components import setup_page, sidebar_nav
 
-st.set_page_config(page_title="Model Training - FreshFlow", page_icon="🧠", layout="wide")
+setup_page("Model Training")
 
 
 @st.cache_resource
@@ -170,12 +171,14 @@ def train_model_for_location(place_id: int, dp) -> dict:
 def main():
     dp = get_services()
 
-    st.markdown("# 🧠 Model Training Dashboard")
+    st.markdown("# Model Training Dashboard")
     st.markdown("Train, manage, and monitor demand forecasting models")
     st.divider()
 
     # Sidebar
     with st.sidebar:
+        sidebar_nav()
+
         st.markdown("### Quick Stats")
         models = get_model_info()
 
@@ -190,16 +193,13 @@ def main():
                 avg_accuracy = sum(m['accuracy'] for m in production_ready) / len(production_ready)
                 st.metric("Avg Accuracy", f"{avg_accuracy:.1f}%")
 
-        st.divider()
-        st.page_link("app.py", label="← Back to Dashboard", icon="🏠")
-
     # Tabs
     tab1, tab2, tab3, tab4 = st.tabs([
-        "📊 Model Overview", "🚀 Train New Model", "📈 Performance Analysis", "⚙️ Model Management"
+        "Model Overview", "Train New Model", "Performance Analysis", "Model Management"
     ])
 
     with tab1:
-        st.subheader("📊 Trained Models Overview")
+        st.subheader("Trained Models Overview")
 
         models = get_model_info()
 
@@ -287,7 +287,7 @@ def main():
             st.info("No trained models found. Go to 'Train New Model' to train your first model!")
 
     with tab2:
-        st.subheader("🚀 Train New Model")
+        st.subheader("Train New Model")
 
         # Get trainable locations
         trainable = get_trainable_locations(dp)
@@ -309,7 +309,7 @@ def main():
                 trained_place_ids = [m['place_id'] for m in models]
 
                 trainable['status'] = trainable['place_id'].apply(
-                    lambda x: '✅ Trained' if x in trained_place_ids else '⏳ Not trained'
+                    lambda x: 'Trained' if x in trained_place_ids else 'Not trained'
                 )
                 trainable['avg_revenue'] = trainable['avg_revenue'].apply(
                     lambda x: f"{x:,.0f} DKK"
@@ -333,18 +333,18 @@ def main():
                     place_id = trainable[trainable['place_name'] == selected_location]['place_id'].values[0]
                     days = trainable[trainable['place_name'] == selected_location]['days'].values[0]
 
-                    st.info(f"📊 {int(days)} days of training data available")
+                    st.info(f"{int(days)} days of training data available")
 
                     # Check if already trained
                     if place_id in trained_place_ids:
-                        st.warning("⚠️ This location already has a trained model. Training will replace it.")
+                        st.warning("This location already has a trained model. Training will replace it.")
 
-                    if st.button("🚀 Start Training", type="primary"):
+                    if st.button("Start Training", type="primary"):
                         with st.spinner(f"Training model for {selected_location}..."):
                             result = train_model_for_location(place_id, dp)
 
                             if result['success']:
-                                st.success("✅ Model trained successfully!")
+                                st.success("Model trained successfully!")
 
                                 metrics = result['metrics']
 
@@ -358,16 +358,16 @@ def main():
                                     st.metric("R²", f"{metrics.get('r2', 0):.3f}")
 
                                 if accuracy >= 70:
-                                    st.success("🎉 Model is production-ready!")
+                                    st.success("Model is production-ready!")
                                 else:
-                                    st.warning("⚠️ Model accuracy is below 70%. Consider gathering more data.")
+                                    st.warning("Model accuracy is below 70%. Consider gathering more data.")
 
                                 st.cache_resource.clear()
                             else:
-                                st.error(f"❌ Training failed: {result.get('error', 'Unknown error')}")
+                                st.error(f"Training failed: {result.get('error', 'Unknown error')}")
 
     with tab3:
-        st.subheader("📈 Performance Analysis")
+        st.subheader("Performance Analysis")
 
         models = get_model_info()
         models_with_metrics = [m for m in models if m['mape'] is not None]
@@ -431,13 +431,13 @@ def main():
 
             col1, col2, col3, col4 = st.columns(4)
             with col1:
-                st.metric("🏆 Excellent", tier_counts['Excellent (90%+)'])
+                st.metric("Excellent", tier_counts['Excellent (90%+)'])
             with col2:
-                st.metric("👍 Good", tier_counts['Good (80-90%)'])
+                st.metric("Good", tier_counts['Good (80-90%)'])
             with col3:
-                st.metric("📊 Fair", tier_counts['Fair (70-80%)'])
+                st.metric("Fair", tier_counts['Fair (70-80%)'])
             with col4:
-                st.metric("⚠️ Needs Work", tier_counts['Needs Improvement (<70%)'])
+                st.metric("Needs Work", tier_counts['Needs Improvement (<70%)'])
 
             # Pie chart
             fig = px.pie(
@@ -452,7 +452,7 @@ def main():
             st.info("No models with performance metrics available. Train models to see performance analysis.")
 
     with tab4:
-        st.subheader("⚙️ Model Management")
+        st.subheader("Model Management")
 
         models = get_model_info()
 
@@ -493,22 +493,22 @@ def main():
 
                     place_id = model_info['place_id']
 
-                    if st.button("🔄 Retrain Model", type="primary"):
+                    if st.button("Retrain Model", type="primary"):
                         with st.spinner(f"Retraining model for {selected_model}..."):
                             result = train_model_for_location(place_id, dp)
 
                             if result['success']:
-                                st.success("✅ Model retrained successfully!")
+                                st.success("Model retrained successfully!")
                                 metrics = result['metrics']
                                 st.metric("New Accuracy", f"{100 - metrics.get('mape', 0):.1f}%")
                                 st.cache_resource.clear()
                             else:
-                                st.error(f"❌ Retraining failed: {result.get('error', 'Unknown error')}")
+                                st.error(f"Retraining failed: {result.get('error', 'Unknown error')}")
 
                     st.divider()
 
                     st.markdown("### Danger Zone")
-                    if st.button("🗑️ Delete Model", type="secondary"):
+                    if st.button("Delete Model", type="secondary"):
                         models_dir = os.path.join(
                             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                             "saved_models"
@@ -521,10 +521,10 @@ def main():
                                 os.remove(model_path)
                             if os.path.exists(metrics_path):
                                 os.remove(metrics_path)
-                            st.success(f"✅ Model deleted: {model_info['filename']}")
+                            st.success(f"Model deleted: {model_info['filename']}")
                             st.cache_resource.clear()
                         except Exception as e:
-                            st.error(f"❌ Error deleting model: {str(e)}")
+                            st.error(f"Error deleting model: {str(e)}")
 
             # Batch operations
             st.divider()
@@ -533,7 +533,7 @@ def main():
             col1, col2 = st.columns(2)
 
             with col1:
-                if st.button("🔄 Retrain All Models"):
+                if st.button("Retrain All Models"):
                     progress = st.progress(0)
                     status = st.empty()
 
@@ -542,7 +542,7 @@ def main():
                         train_model_for_location(model['place_id'], dp)
                         progress.progress((i + 1) / len(models))
 
-                    status.text("✅ All models retrained!")
+                    status.text("All models retrained!")
                     st.cache_resource.clear()
 
             with col2:
@@ -553,7 +553,7 @@ def main():
 
                 csv = export_data.to_csv(index=False)
                 st.download_button(
-                    "📥 Export Model Report",
+                    "Export Model Report",
                     csv,
                     f"model_report_{datetime.now().strftime('%Y%m%d')}.csv",
                     "text/csv"

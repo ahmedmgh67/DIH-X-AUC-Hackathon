@@ -17,33 +17,9 @@ from freshflow.services.weather_service import WeatherService
 from freshflow.services.feature_engineer import FeatureEngineer
 from freshflow.models.predictor import ForecastService
 from freshflow.utils.helpers import format_currency
+from freshflow.components import setup_page, sidebar_nav
 
-st.set_page_config(
-    page_title="Kitchen Prep - FreshFlow",
-    page_icon="🍳",
-    layout="wide"
-)
-
-st.markdown("""
-<style>
-    .prep-card {
-        background: linear-gradient(135deg, #f5f7fa 0%, #e8f5e9 100%);
-        border-radius: 10px;
-        padding: 20px;
-        margin: 10px 0;
-        border-left: 4px solid #1E5631;
-    }
-    .context-banner {
-        background: #e3f2fd;
-        border-radius: 10px;
-        padding: 15px;
-        margin-bottom: 20px;
-    }
-    .confidence-high { color: #2e7d32; font-weight: bold; }
-    .confidence-medium { color: #f57c00; font-weight: bold; }
-    .confidence-low { color: #c62828; font-weight: bold; }
-</style>
-""", unsafe_allow_html=True)
+setup_page("Kitchen Prep")
 
 
 @st.cache_resource
@@ -59,18 +35,20 @@ def main():
     data_processor, weather_service, forecast_service, feature_engineer = get_services()
 
     # Header
-    st.markdown("# 🍳 Kitchen Prep Optimizer")
+    st.markdown("# Kitchen Prep Optimizer")
     st.markdown("Calculate optimal prep quantities to minimize waste and stockouts")
     st.divider()
 
     # Sidebar settings
     with st.sidebar:
+        sidebar_nav()
+
         st.markdown("### Settings")
 
         # Location
         locations = data_processor.get_locations()
         location_options = ["All Locations"] + locations["place_name"].tolist()
-        selected_location = st.selectbox("📍 Location", location_options, index=0)
+        selected_location = st.selectbox("Location", location_options, index=0)
 
         place_id = None if selected_location == "All Locations" else \
             locations[locations["place_name"] == selected_location]["place_id"].values[0]
@@ -82,21 +60,18 @@ def main():
             "Day After Tomorrow": datetime.now() + timedelta(days=2),
             "This Weekend (Sat)": datetime.now() + timedelta(days=(5 - datetime.now().weekday()) % 7),
         }
-        selected_date_label = st.selectbox("📅 Prep For", list(date_options.keys()))
+        selected_date_label = st.selectbox("Prep For", list(date_options.keys()))
         prep_date = date_options[selected_date_label]
 
         # Buffer percentage
         buffer_pct = st.slider(
-            "🛡️ Safety Buffer",
+            "Safety Buffer",
             min_value=5,
             max_value=25,
             value=10,
             step=5,
             help="Extra percentage to add for safety margin"
         ) / 100
-
-        st.divider()
-        st.page_link("app.py", label="← Back to Dashboard", icon="🏠")
 
     # Context Banner
     weather_forecast = weather_service.get_forecast(7)
@@ -110,18 +85,11 @@ def main():
     day_adj, day_reason = feature_engineer.get_day_adjustment(prep_date)
     weather_adj = feature_engineer.get_weather_adjustment(weather_summary)
 
-    # Weather icon
-    weather_icon = "☀️" if weather_summary["icon"] == "sunny" else (
-        "🌧️" if weather_summary["icon"] == "rainy" else (
-            "❄️" if weather_summary["icon"] == "snowy" else "☁️"
-        )
-    )
-
     st.markdown(f"""
     <div class="context-banner">
-        <h4>📋 Prep List for: {prep_date.strftime("%A, %B %d, %Y")}</h4>
+        <h4>Prep List for: {prep_date.strftime("%A, %B %d, %Y")}</h4>
         <p>
-            <strong>Weather:</strong> {weather_icon} {weather_summary['condition']}, {weather_summary['temp']}°C |
+            <strong>Weather:</strong> {weather_summary['condition']}, {weather_summary['temp']}°C |
             <strong>Day Type:</strong> {day_reason} |
             <strong>Buffer:</strong> {buffer_pct*100:.0f}%
         </p>
@@ -141,25 +109,25 @@ def main():
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
-        st.metric("📦 Total Items", prep_data["total_items"])
+        st.metric("Total Items", prep_data["total_items"])
 
     with col2:
-        st.metric("🔢 Total Prep Qty", prep_data["total_prep_qty"])
+        st.metric("Total Prep Qty", prep_data["total_prep_qty"])
 
     with col3:
         total_value = sum(
             item["prep_quantity"] * item["avg_price"]
             for item in prep_data["prep_list"]
         )
-        st.metric("💰 Est. Value", format_currency(total_value))
+        st.metric("Est. Value", format_currency(total_value))
 
     with col4:
-        st.metric("🛡️ Buffer Applied", f"{buffer_pct*100:.0f}%")
+        st.metric("Buffer Applied", f"{buffer_pct*100:.0f}%")
 
     st.divider()
 
     # Prep list table
-    st.subheader("📋 Prep Quantities")
+    st.subheader("Prep Quantities")
 
     prep_df = pd.DataFrame(prep_data["prep_list"])
 
@@ -167,11 +135,11 @@ def main():
         # Add confidence indicator
         def get_confidence_badge(conf):
             if conf == "high":
-                return "🟢 High"
+                return "High"
             elif conf == "medium":
-                return "🟡 Medium"
+                return "Medium"
             else:
-                return "🔴 Low"
+                return "Low"
 
         prep_df["confidence_badge"] = prep_df["confidence"].apply(get_confidence_badge)
 
@@ -194,7 +162,7 @@ def main():
         col1, col2 = st.columns(2)
 
         with col1:
-            st.subheader("📊 Historical Accuracy")
+            st.subheader("Historical Accuracy")
 
             accuracy_metrics = forecast_service.get_accuracy_metrics(place_id)
 
@@ -212,25 +180,25 @@ def main():
             st.progress(min(waste_pct / 0.10, 1.0), text=f"Waste: {waste_pct*100:.1f}% (Target: <5%)")
 
         with col2:
-            st.subheader("💡 Recommendations")
+            st.subheader("Recommendations")
 
             # Smart recommendations based on data
             recommendations = []
 
             if day_adj > 1.15:
-                recommendations.append(f"📈 **High demand day** - {day_reason}. Consider extra prep for popular items.")
+                recommendations.append(f"**High demand day** - {day_reason}. Consider extra prep for popular items.")
 
             if weather_summary.get("is_rainy"):
-                recommendations.append("🌧️ **Rain expected** - Hot soups and comfort foods typically see +15-20% demand.")
+                recommendations.append("**Rain expected** - Hot soups and comfort foods typically see +15-20% demand.")
 
             if weather_summary.get("is_cold"):
-                recommendations.append("❄️ **Cold weather** - Hot drinks and warm meals will be in higher demand.")
+                recommendations.append("**Cold weather** - Hot drinks and warm meals will be in higher demand.")
 
             if buffer_pct < 0.10:
-                recommendations.append("⚠️ **Low buffer** - Consider increasing buffer to 10% to reduce stockout risk.")
+                recommendations.append("**Low buffer** - Consider increasing buffer to 10% to reduce stockout risk.")
 
             if not recommendations:
-                recommendations.append("✅ **Normal conditions** - Standard prep quantities should be sufficient.")
+                recommendations.append("**Normal conditions** - Standard prep quantities should be sufficient.")
 
             for rec in recommendations:
                 st.markdown(rec)
@@ -238,14 +206,14 @@ def main():
         st.divider()
 
         # Export options
-        st.subheader("📤 Export Options")
+        st.subheader("Export Options")
 
         col1, col2, col3 = st.columns(3)
 
         with col1:
             csv = prep_df.to_csv(index=False)
             st.download_button(
-                label="📥 Download CSV",
+                label="Download CSV",
                 data=csv,
                 file_name=f"prep_list_{prep_date.strftime('%Y%m%d')}.csv",
                 mime="text/csv",
@@ -277,7 +245,7 @@ Generated by FreshFlow
             """
 
             st.download_button(
-                label="🖨️ Print-Ready Format",
+                label="Print-Ready Format",
                 data=print_content,
                 file_name=f"prep_list_{prep_date.strftime('%Y%m%d')}.txt",
                 mime="text/plain",
@@ -285,7 +253,7 @@ Generated by FreshFlow
             )
 
         with col3:
-            st.button("📧 Email to Kitchen", disabled=True, use_container_width=True,
+            st.button("Email to Kitchen", disabled=True, use_container_width=True,
                      help="Email integration coming soon")
 
     else:

@@ -16,8 +16,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspa
 from freshflow.services.data_processor import DataProcessor
 from freshflow.services.anomaly_service import AnomalyDetector, AnomalyType, AlertSeverity
 from freshflow.utils.helpers import format_currency
+from freshflow.components import setup_page, sidebar_nav
 
-st.set_page_config(page_title="Anomalies - FreshFlow", page_icon="🚨", layout="wide")
+setup_page("Anomalies")
 
 
 @st.cache_resource
@@ -39,27 +40,29 @@ def severity_color(severity):
 
 def severity_icon(severity):
     icons = {
-        AlertSeverity.CRITICAL: "🔴",
-        AlertSeverity.HIGH: "🟠",
-        AlertSeverity.MEDIUM: "🟡",
-        AlertSeverity.LOW: "🟢"
+        AlertSeverity.CRITICAL: "CRITICAL",
+        AlertSeverity.HIGH: "HIGH",
+        AlertSeverity.MEDIUM: "MEDIUM",
+        AlertSeverity.LOW: "LOW"
     }
-    return icons.get(severity, "⚪")
+    return icons.get(severity, "UNKNOWN")
 
 
 def main():
     dp, anomaly_detector = get_services()
 
-    st.markdown("# 🚨 Anomaly Detection & Alerts")
+    st.markdown("# Anomaly Detection & Alerts")
     st.markdown("Automatically detect unusual sales patterns and get actionable insights")
     st.divider()
 
     # Sidebar
     with st.sidebar:
+        sidebar_nav()
+
         st.markdown("### Settings")
         locations = dp.get_locations()
         location_options = ["All Locations"] + locations["place_name"].tolist()
-        selected_location = st.selectbox("📍 Location", location_options)
+        selected_location = st.selectbox("Location", location_options)
 
         place_id = None if selected_location == "All Locations" else \
             locations[locations["place_name"] == selected_location]["place_id"].values[0]
@@ -73,9 +76,6 @@ def main():
 
         z_threshold = {"Low": 3.0, "Medium": 2.5, "High": 2.0}[sensitivity]
 
-        st.divider()
-        st.page_link("app.py", label="← Back to Dashboard", icon="🏠")
-
     # Get anomaly summary
     summary = anomaly_detector.get_anomaly_summary(place_id, days=lookback)
     anomalies = anomaly_detector.detect_anomalies(place_id, lookback, z_threshold)
@@ -86,21 +86,21 @@ def main():
     with col1:
         st.metric("Total Anomalies", summary['total_anomalies'])
     with col2:
-        st.metric("🔴 Critical", summary['critical'])
+        st.metric("Critical", summary['critical'])
     with col3:
-        st.metric("🟠 High", summary['high'])
+        st.metric("High", summary['high'])
     with col4:
-        st.metric("🟡 Medium", summary['medium'])
+        st.metric("Medium", summary['medium'])
     with col5:
-        st.metric("🟢 Low", summary['low'])
+        st.metric("Low", summary['low'])
 
     st.divider()
 
     # Tabs
-    tab1, tab2, tab3 = st.tabs(["📊 Anomaly Timeline", "🚨 Alert List", "📈 Analysis"])
+    tab1, tab2, tab3 = st.tabs(["Anomaly Timeline", "Alert List", "Analysis"])
 
     with tab1:
-        st.subheader("📊 Sales with Anomaly Highlights")
+        st.subheader("Sales with Anomaly Highlights")
 
         daily_sales = dp.get_daily_sales(place_id)
         daily_sales['date'] = pd.to_datetime(daily_sales['date'])
@@ -155,7 +155,7 @@ def main():
         st.plotly_chart(fig, use_container_width=True)
 
     with tab2:
-        st.subheader("🚨 Detected Anomalies")
+        st.subheader("Detected Anomalies")
 
         if anomalies:
             for anomaly in anomalies[:20]:
@@ -184,10 +184,10 @@ def main():
                     for action in anomaly.recommended_actions:
                         st.markdown(f"- {action}")
         else:
-            st.success("✅ No anomalies detected in the selected period!")
+            st.success("No anomalies detected in the selected period!")
 
     with tab3:
-        st.subheader("📈 Anomaly Analysis")
+        st.subheader("Anomaly Analysis")
 
         col1, col2 = st.columns(2)
 

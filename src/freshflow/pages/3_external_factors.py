@@ -18,12 +18,9 @@ from freshflow.services.data_processor import DataProcessor
 from freshflow.services.weather_service import WeatherService
 from freshflow.services.feature_engineer import FeatureEngineer
 from freshflow.utils.helpers import DANISH_HOLIDAYS_2021_2024, format_currency, format_percentage
+from freshflow.components import setup_page, sidebar_nav
 
-st.set_page_config(
-    page_title="External Factors - FreshFlow",
-    page_icon="🌤️",
-    layout="wide"
-)
+setup_page("External Factors")
 
 
 @st.cache_resource
@@ -38,38 +35,37 @@ def main():
     data_processor, weather_service, feature_engineer = get_services()
 
     # Header
-    st.markdown("# 🌤️ External Factors Analysis")
+    st.markdown("# External Factors Analysis")
     st.markdown("Understand how weather, time patterns, and campaigns affect demand")
     st.divider()
 
     # Sidebar
     with st.sidebar:
+        sidebar_nav()
+
         st.markdown("### Filters")
 
         locations = data_processor.get_locations()
         location_options = ["All Locations"] + locations["place_name"].tolist()
-        selected_location = st.selectbox("📍 Location", location_options, index=0)
+        selected_location = st.selectbox("Location", location_options, index=0)
 
         place_id = None if selected_location == "All Locations" else \
             locations[locations["place_name"] == selected_location]["place_id"].values[0]
-
-        st.divider()
-        st.page_link("app.py", label="← Back to Dashboard", icon="🏠")
 
     # Get pattern analysis
     patterns = feature_engineer.analyze_historical_patterns(place_id)
 
     # Tabs for different analyses
     tab1, tab2, tab3, tab4 = st.tabs([
-        "📅 Time Patterns",
-        "🌧️ Weather Impact",
-        "🎯 Campaign Performance",
-        "🎄 Holiday Impact"
+        "Time Patterns",
+        "Weather Impact",
+        "Campaign Performance",
+        "Holiday Impact"
     ])
 
     # Tab 1: Time Patterns
     with tab1:
-        st.subheader("📅 Time Pattern Analysis")
+        st.subheader("Time Pattern Analysis")
 
         col1, col2 = st.columns(2)
 
@@ -107,8 +103,8 @@ def main():
 
             st.markdown(f"""
             **Key Insights:**
-            - 📈 **Best day:** {best_day['day_name']} ({best_day['relative_demand']*100:+.0f}% vs average)
-            - 📉 **Slowest day:** {worst_day['day_name']} ({worst_day['relative_demand']*100:+.0f}% vs average)
+            - **Best day:** {best_day['day_name']} ({best_day['relative_demand']*100:+.0f}% vs average)
+            - **Slowest day:** {worst_day['day_name']} ({worst_day['relative_demand']*100:+.0f}% vs average)
             """)
 
         with col2:
@@ -136,8 +132,8 @@ def main():
 
             st.markdown(f"""
             **Key Insights:**
-            - 🕐 **Peak hour:** {int(peak_hour['hour'])}:00 - {int(peak_hour['hour'])+1}:00
-            - 💰 **Peak revenue:** {format_currency(peak_hour['avg_revenue'])}/hour average
+            - **Peak hour:** {int(peak_hour['hour'])}:00 - {int(peak_hour['hour'])+1}:00
+            - **Peak revenue:** {format_currency(peak_hour['avg_revenue'])}/hour average
             """)
 
         # Monthly seasonality
@@ -174,7 +170,7 @@ def main():
 
     # Tab 2: Weather Impact
     with tab2:
-        st.subheader("🌧️ Weather Impact Analysis")
+        st.subheader("Weather Impact Analysis")
 
         weather_impact = patterns.get("weather_impact", {})
 
@@ -199,7 +195,7 @@ def main():
                     fig_temp = go.Figure()
 
                     colors = ["#64b5f6", "#81c784", "#ffb74d"]  # Cold, Moderate, Hot
-                    icons = ["❄️ Cold (<5°C)", "🌡️ Moderate", "☀️ Hot (>20°C)"]
+                    icons = ["Cold (<5C)", "Moderate", "Hot (>20C)"]
 
                     fig_temp.add_trace(go.Bar(
                         x=icons,
@@ -224,17 +220,17 @@ def main():
                     rainy_impact = weather_impact["rainy"]["vs_baseline"]
 
                     st.metric(
-                        "🌧️ Rainy Day Effect",
+                        "Rainy Day Effect",
                         f"{rainy_impact*100:+.1f}%",
                         delta="vs dry days"
                     )
 
                     st.markdown("""
                     **Typical patterns on rainy days:**
-                    - 🍜 Hot soups & stews: +15-25%
-                    - ☕ Hot drinks: +20-30%
-                    - 🥗 Cold salads: -10-15%
-                    - 🚗 Delivery orders: +25-35%
+                    - Hot soups & stews: +15-25%
+                    - Hot drinks: +20-30%
+                    - Cold salads: -10-15%
+                    - Delivery orders: +25-35%
                     """)
 
                 # Weather correlation scatter
@@ -276,7 +272,7 @@ def main():
 
     # Tab 3: Campaign Performance
     with tab3:
-        st.subheader("🎯 Campaign Performance")
+        st.subheader("Campaign Performance")
 
         try:
             campaigns = data_processor.load_campaigns()
@@ -318,7 +314,7 @@ def main():
 
         # General campaign insights
         st.divider()
-        st.markdown("### 📊 Campaign Best Practices")
+        st.markdown("### Campaign Best Practices")
 
         st.markdown("""
         Based on industry benchmarks and data patterns:
@@ -334,7 +330,7 @@ def main():
 
     # Tab 4: Holiday Impact
     with tab4:
-        st.subheader("🎄 Holiday Impact Analysis")
+        st.subheader("Holiday Impact Analysis")
 
         st.markdown("### Danish Public Holidays")
 
@@ -376,7 +372,7 @@ def main():
 
         # Upcoming holidays
         st.divider()
-        st.markdown("### 📅 Upcoming Holidays")
+        st.markdown("### Upcoming Holidays")
 
         today = datetime.now()
         upcoming = []
@@ -397,21 +393,6 @@ def main():
             st.dataframe(upcoming_df, use_container_width=True, hide_index=True)
         else:
             st.info("No upcoming holidays in the next 90 days (in dataset date range).")
-
-        # Planning recommendations
-        st.markdown("""
-        ### 💡 Holiday Planning Tips
-
-        **Before Major Holidays:**
-        - Adjust inventory orders 3-5 days in advance
-        - Schedule extra staff for high-demand holidays
-        - Prepare promotional materials for holiday specials
-
-        **During Low-Demand Holidays:**
-        - Consider reduced hours or closure
-        - Use for deep cleaning and maintenance
-        - Plan staff time off fairly
-        """)
 
 
 if __name__ == "__main__":

@@ -38,6 +38,7 @@ env/
 
 # Data files (large)
 data/
+docs/plans/
 
 # Model files (can be regenerated)
 src/freshflow/saved_models/*.pkl

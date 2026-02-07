@@ -18,24 +18,9 @@ from freshflow.services.data_processor import DataProcessor
 from freshflow.services.weather_service import WeatherService
 from freshflow.models.predictor import ForecastService
 from freshflow.utils.helpers import format_currency, format_percentage
+from freshflow.components import setup_page, sidebar_nav
 
-st.set_page_config(
-    page_title="Forecasting - FreshFlow",
-    page_icon="📈",
-    layout="wide"
-)
-
-st.markdown("""
-<style>
-    .metric-card {
-        background: #f8f9fa;
-        border-radius: 10px;
-        padding: 15px;
-        text-align: center;
-        border: 1px solid #e9ecef;
-    }
-</style>
-""", unsafe_allow_html=True)
+setup_page("Forecasting")
 
 
 @st.cache_resource
@@ -50,34 +35,33 @@ def main():
     data_processor, weather_service, forecast_service = get_services()
 
     # Header
-    st.markdown("# 📈 Demand Forecasting")
+    st.markdown("# Demand Forecasting")
     st.markdown("Detailed predictions with confidence intervals and item-level breakdown")
     st.divider()
 
     # Sidebar filters
     with st.sidebar:
+        sidebar_nav()
+
         st.markdown("### Filters")
 
         # Location
         locations = data_processor.get_locations()
         location_options = ["All Locations"] + locations["place_name"].tolist()
-        selected_location = st.selectbox("📍 Location", location_options, index=0)
+        selected_location = st.selectbox("Location", location_options, index=0)
 
         place_id = None if selected_location == "All Locations" else \
             locations[locations["place_name"] == selected_location]["place_id"].values[0]
 
         # Time granularity
         granularity = st.radio(
-            "⏱️ Time Granularity",
+            "Time Granularity",
             ["Daily", "Weekly", "Monthly"],
             index=0
         )
 
         # Forecast horizon
-        forecast_days = st.slider("📅 Forecast Days", 7, 30, 14)
-
-        st.divider()
-        st.page_link("app.py", label="← Back to Dashboard", icon="🏠")
+        forecast_days = st.slider("Forecast Days", 7, 30, 14)
 
     # Main content
     col1, col2, col3 = st.columns(3)
@@ -87,23 +71,23 @@ def main():
 
     with col1:
         mape = accuracy_metrics.get("mape", 0.1)
-        st.metric("📊 MAPE", f"{mape * 100:.1f}%", help="Mean Absolute Percentage Error")
+        st.metric("MAPE", f"{mape * 100:.1f}%", help="Mean Absolute Percentage Error")
 
     with col2:
         # Simulated RMSE
         daily_sales = data_processor.get_daily_sales(place_id)
         avg_revenue = daily_sales["total_revenue"].mean()
         rmse = avg_revenue * mape * 1.5  # Approximate
-        st.metric("📉 RMSE", format_currency(rmse), help="Root Mean Square Error")
+        st.metric("RMSE", format_currency(rmse), help="Root Mean Square Error")
 
     with col3:
         r2 = 1 - (mape * 2)  # Approximate R²
-        st.metric("🎯 R² Score", f"{max(0, r2):.3f}", help="Coefficient of Determination")
+        st.metric("R² Score", f"{max(0, r2):.3f}", help="Coefficient of Determination")
 
     st.divider()
 
     # Forecast Chart
-    st.subheader("📈 Forecast vs Historical")
+    st.subheader("Forecast vs Historical")
 
     # Get historical data
     daily_sales = data_processor.get_daily_sales(place_id)
@@ -176,7 +160,7 @@ def main():
     st.divider()
 
     # Item-level forecasts
-    st.subheader("🍔 Item-Level Forecasts")
+    st.subheader("Item-Level Forecasts")
 
     item_forecasts = forecast_service.forecast_items(place_id, days=forecast_days, top_n=15)
 
@@ -214,7 +198,7 @@ def main():
     with col2:
         csv = item_summary.to_csv(index=False)
         st.download_button(
-            label="📥 Download CSV",
+            label="Download CSV",
             data=csv,
             file_name=f"forecast_{datetime.now().strftime('%Y%m%d')}.csv",
             mime="text/csv"
@@ -223,7 +207,7 @@ def main():
     st.divider()
 
     # Forecast breakdown by day
-    st.subheader("📅 Daily Forecast Breakdown")
+    st.subheader("Daily Forecast Breakdown")
 
     tabs = st.tabs([f.strftime("%a %d") for f in forecast_df["date"][:7]])
 
@@ -242,7 +226,7 @@ def main():
 
             with col3:
                 is_weekend = day_data.get("is_weekend", False)
-                st.metric("Weekend", "Yes ✓" if is_weekend else "No")
+                st.metric("Weekend", "Yes" if is_weekend else "No")
 
             if len(day_items) > 0:
                 st.markdown("**Top Items:**")
