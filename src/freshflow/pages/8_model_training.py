@@ -186,12 +186,12 @@ def main():
 
         if models:
             production_ready = [m for m in models if m['accuracy'] and m['accuracy'] >= 70]
-            st.metric("Production Ready", len(production_ready),
-                     help="Models with 70%+ accuracy")
+            # st.metric("Production Ready", len(production_ready),
+            #          help="Models with 70%+ accuracy")
 
-            if production_ready:
-                avg_accuracy = sum(m['accuracy'] for m in production_ready) / len(production_ready)
-                st.metric("Avg Accuracy", f"{avg_accuracy:.1f}%")
+            # if production_ready:
+            #     avg_accuracy = sum(m['accuracy'] for m in production_ready) / len(production_ready)
+            #     st.metric("Avg Accuracy", f"{avg_accuracy:.1f}%")
 
     # Tabs
     tab1, tab2, tab3, tab4 = st.tabs([
@@ -199,7 +199,7 @@ def main():
     ])
 
     with tab1:
-        st.subheader("Trained Models Overview")
+        # st.subheader("Trained Models Overview")
 
         models = get_model_info()
 
@@ -210,15 +210,15 @@ def main():
             gb_models = [m for m in models if m['model_type'] == 'Gradient Boosting']
             lstm_models = [m for m in models if m['model_type'] == 'LSTM']
 
-            with col1:
-                st.metric("Total Models", len(models))
-            with col2:
-                st.metric("GB Models", len(gb_models))
-            with col3:
-                st.metric("LSTM Models", len(lstm_models))
-            with col4:
-                high_accuracy = [m for m in models if m['accuracy'] and m['accuracy'] >= 90]
-                st.metric("High Accuracy (90%+)", len(high_accuracy))
+            # with col1:
+            #     st.metric("Total Models", len(models))
+            # with col2:
+            #     st.metric("GB Models", len(gb_models))
+            # with col3:
+            #     st.metric("LSTM Models", len(lstm_models))
+            # with col4:
+            #     high_accuracy = [m for m in models if m['accuracy'] and m['accuracy'] >= 90]
+            #     st.metric("High Accuracy (90%+)", len(high_accuracy))
 
             # Models table
             st.markdown("### Model List")
@@ -259,7 +259,7 @@ def main():
             st.dataframe(display_df, use_container_width=True, hide_index=True)
 
             # Accuracy distribution chart
-            st.markdown("### Accuracy Distribution")
+            # st.markdown("### Accuracy Distribution")
 
             models_with_accuracy = [m for m in models if m['accuracy'] is not None]
             if models_with_accuracy:

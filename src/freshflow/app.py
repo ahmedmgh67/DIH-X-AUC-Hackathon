@@ -306,15 +306,15 @@ def main():
 
         # Navigation
         st.markdown("**Navigation**")
-        st.page_link("app.py", label="DASHBOARD")
-        st.page_link("pages/1_forecasting.py", label="FORECASTING")
-        st.page_link("pages/2_kitchen_prep.py", label="KITCHEN PREP")
-        st.page_link("pages/3_external_factors.py", label="EXTERNAL FACTORS")
-        st.page_link("pages/4_promotions.py", label="PROMOTIONS")
-        st.page_link("pages/5_anomalies.py", label="ANOMALIES")
-        st.page_link("pages/6_scenarios.py", label="SCENARIOS")
-        st.page_link("pages/7_inventory.py", label="INVENTORY")
-        st.page_link("pages/8_model_training.py", label="MODEL TRAINING")
+        st.page_link("app.py", label="Dashboard")
+        st.page_link("pages/1_forecasting.py", label="Forecasting")
+        st.page_link("pages/2_kitchen_prep.py", label="Kitchen Prep")
+        st.page_link("pages/3_external_factors.py", label="External Factors")
+        st.page_link("pages/4_promotions.py", label="Promotions")
+        st.page_link("pages/5_anomalies.py", label="Anomalies")
+        st.page_link("pages/6_scenarios.py", label="Scenarios")
+        st.page_link("pages/7_inventory.py", label="Inventory")
+        st.page_link("pages/8_model_training.py", label="Model Training")
 
     # Main content
     st.markdown('<p class="main-header">Expecto Dashboard</p>', unsafe_allow_html=True)
